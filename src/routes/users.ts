@@ -1,12 +1,14 @@
 import express from "express";
 const router = express.Router();
 import{getAllUser,createNewUser,updateUser, deleteUser}from '../controllers/userController'
-import { get } from "http";
+import { verification } from "../middlewares/auth"; 
 import upload from "../middlewares/fileUploadConfig";
+import { validate } from "../middlewares/schemaValidation";
+import { createUserSchema } from "../schemas/userSchema";
 /* GET users listing. */
-router.get('/get-all-user',getAllUser );
-router.post('/create-user',upload.single("profile"),createNewUser)
-router.put('/update-user/',updateUser)
-router.delete('/delete-user/:id',deleteUser)
+router.get('/get-all-user',verification,getAllUser );
+router.post('/create-user',upload.single("profile"),validate(createUserSchema),createNewUser)
+router.put('/update-user/',verification,updateUser)
+router.delete('/delete-user/:id',verification,deleteUser)
 
 export default router;

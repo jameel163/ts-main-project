@@ -4,6 +4,7 @@ import { User, CreateUser, UserUpdate, AddressAttributes, UserAttributes } from 
 import { body } from "express-validator";
 import fs from "fs";
 import path from "path";
+import  Jwt  from "jsonwebtoken";
 const { UserDetails, AddressDetails } = db
 
 
@@ -27,7 +28,10 @@ export const createNewUser = async (req: Request, res: Response): Promise<any> =
     const { name, email, address, password, phone_no } = details
     const user = await UserDetails.create({ name, email, password, phone_no,user_profile })
     await AddressDetails.create({ address, user_id: user.id })
-    res.status(201).send("User Created Successfully")
+    const token=Jwt.sign({
+      name:name,password:password
+    },"MY_SECRET_TOKEN",{expiresIn:"1m"})
+    res.status(201).send({message:"User Created Successfully",token:token})
   }
   catch (error) {
     res.status(500).json(error)
