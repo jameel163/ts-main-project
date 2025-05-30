@@ -8,7 +8,7 @@ import { createUserSchema } from "../schemas/userSchema";
 /* GET users listing. */
 router.get('/get-all-user',verification,getAllUser );
 router.post('/create-user',upload.single("profile"),validate(createUserSchema),createNewUser)
-router.put('/update-user/',verification,updateUser)
+router.put('/update-user/',updateUser)
 router.delete('/delete-user/:id',verification,deleteUser)
 
 export default router;

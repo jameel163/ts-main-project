@@ -6,11 +6,11 @@ import { UserAttributes } from '../interfaces/userInterfaces';
 // Define class
 type studentCreationAttributes = Optional<UserAttributes,  "id" | "user_profile">;
 export class UserDetails extends Model<UserAttributes,studentCreationAttributes> implements UserAttributes {
-  public id!: number;
-  public name!: string;
-  public email!: string;
-  public phone_no!: number;
-  public password!: string;
+   id!: number;
+   name!: string;
+   email!: string;
+   phone_no!: number;
+   password!: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

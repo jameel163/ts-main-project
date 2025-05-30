@@ -4,13 +4,15 @@ import { User, CreateUser, UserUpdate, AddressAttributes, UserAttributes } from 
 import { body } from "express-validator";
 import fs from "fs";
 import path from "path";
-import  Jwt  from "jsonwebtoken";
+import Jwt from "jsonwebtoken";
 const { UserDetails, AddressDetails } = db
 
+import { Service } from "../services/email";
+const serviceInstance = new Service()
 
 export const getAllUser = async (req: Request, res: Response) => {
   try {
-    const users: User[] = await UserDetails.findAll()
+    const users: User[] = await Service.getAllUserDetails()
     res.send(users)
   } catch (error) {
     console.error("Error creating user:", error);
@@ -20,18 +22,20 @@ export const getAllUser = async (req: Request, res: Response) => {
 
 export const createNewUser = async (req: Request, res: Response): Promise<any> => {
   try {
-    const details: CreateUser = req.body
+    const createUserReq: CreateUser = req.body
 
-    const user_profile = req.file ? req.file.filename : "";
-    console.log(user_profile)
+    const userProfilePath = req.file ? req.file.filename : "";
 
-    const { name, email, address, password, phone_no } = details
-    const user = await UserDetails.create({ name, email, password, phone_no,user_profile })
-    await AddressDetails.create({ address, user_id: user.id })
-    const token=Jwt.sign({
-      name:name,password:password
-    },"MY_SECRET_TOKEN",{expiresIn:"1m"})
-    res.status(201).send({message:"User Created Successfully",token:token})
+
+    const { name, email, address, password, phone_no } = createUserReq
+    // const user = await UserDetails.create({ name, email, password, phone_no,user_profile })
+    // await AddressDetails.create({ address, user_id: user.id })
+    await Service.addNewUser(createUserReq, userProfilePath)
+
+    const token = Jwt.sign({
+      name: name, password: password
+    }, "MY_SECRET_TOKEN")
+    res.status(201).send({ message: "User Created Successfully", token: token })
   }
   catch (error) {
     res.status(500).json(error)
@@ -42,35 +46,14 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
   try {
     const bodyData: UserUpdate = req.body;
     const { user_id, address, ...userFields } = bodyData;
-
+    //console.log(bodyData)
     if (!user_id) {
       return res.status(400).json({ message: 'user_id is required' });
     }
 
-    const user = await UserDetails.findByPk(user_id, {
-      include: [{ model: AddressDetails, as: 'addresses' }],
-    });
+    const updateStatus = await Service.updateUser(bodyData);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Filter user fields that are not undefined and exist in the User model
-    const validFields = Object.fromEntries(
-      Object.entries(userFields).filter(([_, value]) => value !== undefined)
-    );
-
-    for (const key in userFields) {
-      const typedKey = key as keyof typeof userFields;
-      if (userFields[typedKey] !== undefined) {
-        validFields[typedKey] = userFields[typedKey]!;
-      }
-    }
-    // Update only provided fields
-    await user.update(validFields);
-
-
-    return res.status(200).json({ message: 'User updated successfully', user });
+    return res.status(200).json({ message:updateStatus });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Server error', error });
@@ -105,16 +88,11 @@ export const updateUser = async (req: Request, res: Response): Promise<any> => {
 
 export const deleteUser = async (req: Request, res: Response): Promise<any> => {
   try {
-    const userId = req.params.id;
+    const userId:any = req.params.id;
 
-    const user = await UserDetails.findByPk(userId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    // await AddressDetails.destroy({
-    //     where: { user_id: user.id },
-    //   });
-    await user.destroy(); // Automatically deletes related addresses
-
+    const user:string = await Service.deleteUser(userId);
     return res.status(200).json({ message: 'User and addresses deleted successfully' });
+  
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Server error', error });
