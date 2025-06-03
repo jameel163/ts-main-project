@@ -25,7 +25,7 @@ export const retriveEmailData = async (messageType: string) => {
     return mailOption
 }
 
-export class Service {
+export class SequelizeServices {
     static async getAllUserDetails() {
         return await UserDetails.findAll()
     }
@@ -44,21 +44,49 @@ export class Service {
         return
     }
 
-    static async updateUser(updateDetails:UserUpdate){
-        const user = await Service.getUserById(updateDetails.user_id)
-        if(user) {
+    static async updateUser(updateDetails: UserUpdate) {
+        const user = await SequelizeServices.getUserById(updateDetails.user_id)
+        if (user) {
             await user.update(updateDetails)
             return "User updated"
         }
 
         else return "No user found"
     }
-    static async deleteUser(userId:number){
-        const user = await Service.getUserById(userId);
-         if (!user) return "User not Found"
-        const k= await user.destroy();
+    static async deleteUser(userId: number) {
+        const user = await SequelizeServices.getUserById(userId);
+        if (!user) return "User not Found"
+        const k = await user.destroy();
         console.log(k)
-         return "User Deleted successfully"
+        return "User Deleted successfully"
+    }
+
+    static async bulkInsert(bulkUserData: any[]) {
+
+
+        // Extract user and address info
+        const userData = bulkUserData.map(row => ({
+            name: row.name,
+            email: row.email,
+            phone_no: row.phone_no,
+            password: row.password,
+        }));
+
+        
+        const insertedUsers = await UserDetails.bulkCreate(userData, { returning: true });
+
+      
+        const emailToUserId = new Map(insertedUsers.map(u => [u.email, u.id]));
+        console.log(emailToUserId)
+        
+        const addressData: any = bulkUserData.map(row => ({
+            address: row.address,
+            userId: emailToUserId.get(row.email),
+        }));
+
+
+        await AddressDetails.bulkCreate(addressData);
+
     }
 
 }

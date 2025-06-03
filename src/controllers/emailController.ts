@@ -1,6 +1,6 @@
 import { Request,Response } from "express";
 import  db  from "../models/index";
-import { retriveEmailData, transporter } from "../services/email";
+import { retriveEmailData, transporter } from "../services/sequelize.service";
 const {email}=db
 
 import { EmailData,sendEmail,emailRes, errorResponse } from "../interfaces/emailInterface";
