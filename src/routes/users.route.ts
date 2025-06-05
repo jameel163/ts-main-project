@@ -7,10 +7,12 @@ import fileUpload from "../middlewares/fileUploadConfig";
 import { validate } from "../middlewares/schemaValidation";
 import { createUserSchema } from "../schemas/userSchema";
 /* GET users listing. */
+
+
 router.get('/get-all-user',verification,getAllUser );
 router.post('/create-user',uploadImage.single("profile"),validate(createUserSchema),createNewUser)
 router.post('/create-users-by-csv',fileUpload.single("csv"),uploadCSVController)
-router.put('/update-user/',updateUser)
+router.put('/update-user',verification,updateUser)
 router.delete('/delete-user/:id',verification,deleteUser)
 
 

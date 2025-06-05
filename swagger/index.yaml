@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: User API
+  description: A simple CRUD API using Express and documented with Swagger
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+paths:
+  /get-all-user:
+    get:
+      summary: Get All User List
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Users Retrieved Successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                      description: Unique User ID
+                    name:
+                      type: string
+                      description: User Name
+                    email:
+                      type: string
+                      description: User Email
+                    phone_no:
+                      type: string
+                      description: User Phone Number
+                    password:
+                      type: string
+                      description: User Password
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: Timestamp when the user was created
+                    updatedAt:
+                      type: string
+                      format: date-time
+                      description: Timestamp when the user was last updated
+                    user_profile:
+                      type: string
+                      description: User Role or Profile
+        '400':
+          description: Request Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error Message
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error Message
+
+
+  /create-user:
+    post:
+      summary: Create a new user
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Staff Name
+                address:
+                  type: string
+                  description: Staff Role
+                phone_no:
+                  type: string
+                  description: Staff Phone Number
+                password:
+                  type: string
+                  description: Staff Password
+                email:
+                  type: string
+                  description: Staff Email
+                profile:
+                  type: string
+                  format: binary
+                  description: Upload profile picture
+      responses:
+        "201":
+          description: User created
+        "401":
+          description: Unauthorized
+
+
+  /update-user:
+    put:
+      summary: Update a user
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                  description: Unique Student Id
+                name:
+                  type: string
+                  description: Staff Name
+                
+                
+      responses:
+        "200":
+          description: User updated
+        "401":
+          description: Unauthorized
+
+    
+  /delete-user/{id}:
+        delete:
+          summary: Delete a user
+          tags:
+            - User
+          security:
+            - bearerAuth: []
+          parameters:
+            - name: id
+              in: path
+              required: true
+              description: The ID of the user to delete
+              schema:
+                type: number
+          responses:
+            '204':
+              description: User deleted successfully
+            '401':
+              description: Unauthorized
+            '404':
+              description: User not found

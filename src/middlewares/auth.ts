@@ -31,7 +31,7 @@ export const verification = (req: Request, res: Response, next: NextFunction): v
         return;
     }
 
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1];//[bearer,adsfasdfas]
 
     if (!token) {
         res.status(401).send("Authentication Required: Invalid token format");
@@ -44,6 +44,7 @@ export const verification = (req: Request, res: Response, next: NextFunction): v
                 res.status(403).send("Invalid Token");
                 return;
             }
+            
             console.log(payload)
             // Optionally attach payload to req here: req.user = payload;
             next(); // Only call next() if no response was already sent
