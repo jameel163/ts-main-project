@@ -1,10 +1,11 @@
 import cron from 'node-cron'
 import fs from 'fs'
 import path from 'path'
-import e from 'express'
 
-cron.schedule('0 0 * * 0',()=>{
-    const uploadPath=path.join(__dirname,'uploads')
+//every day 10'O clock it cleans the files
+cron.schedule('0 10 * * *',()=>{
+    console.log("hii")
+    const uploadPath=path.join(__dirname,'../../uploads')
     fs.readdir(uploadPath,(err,files)=>{
         if(err){
             return console.log(err)

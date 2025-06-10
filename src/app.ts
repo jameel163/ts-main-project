@@ -8,6 +8,7 @@ import fs from 'fs'
 import swaggerJsDocs from "swagger-jsdoc";
 import yaml from 'yaml'
 import YAML from "yamljs";
+import './cron/cleanUploads'
 
 const app = express();
 

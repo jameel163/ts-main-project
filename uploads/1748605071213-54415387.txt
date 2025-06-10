@@ -1,2 +1,0 @@
-name,email,phone_no,password,address
-hello,hello@gmail.com,756493,J@meel2004,djsflkad
